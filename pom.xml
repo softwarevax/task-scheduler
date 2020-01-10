@@ -13,6 +13,7 @@
 		<module>dependencies-bom</module>
 		<module>task-schedule</module>
 		<module>schedule-web</module>
+		<module>task-deploy</module>
 	</modules>
 
 	<properties>
