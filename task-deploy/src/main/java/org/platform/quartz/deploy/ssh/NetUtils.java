@@ -45,4 +45,16 @@ public class NetUtils {
         }
         return sets;
     }
+
+    /**
+     * 是否是合法端口
+     * @param port
+     * @return
+     */
+    public static boolean isPort(int port) {
+        if(port >= 1 && port <= 65535) {
+            return true;
+        }
+        return false;
+    }
 }

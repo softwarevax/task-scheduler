@@ -9,6 +9,11 @@ package org.platform.quartz.deploy.ssh;
  */
 public interface Execution {
 
+    /**
+     * 执行shell命令
+     * @param cmd shell/cmd命令
+     * @return 控制台返回结果
+     */
     String execute(String cmd);
 
 }

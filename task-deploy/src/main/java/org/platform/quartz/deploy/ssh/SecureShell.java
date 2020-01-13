@@ -7,5 +7,5 @@ package org.platform.quartz.deploy.ssh;
  * @classname Connection
  * @date 2020/1/10 16:57
  */
-public interface Connection extends Login, Closable {
+public interface SecureShell extends Login, Execution, Closable {
 }

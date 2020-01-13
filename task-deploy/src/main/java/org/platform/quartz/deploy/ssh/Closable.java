@@ -9,5 +9,9 @@ package org.platform.quartz.deploy.ssh;
  */
 public interface Closable {
 
+    /**
+     * 关闭安全连接
+     * @return 是否关闭成功
+     */
     boolean close();
 }
