@@ -18,7 +18,7 @@ public class Application {
 		String targetPath = "/data/test";
 
 		// 1、拉取代码
-		GitHelper.download("https://github.com/softwarevax/data-tunnel-parent.git", "softwarevax", "ctw134233", localPath, "origin");
+		GitHelper.download("https://github.com/softwarevax/data-tunnel-parent.git", "softwarevax", "*******", localPath, "origin");
 
 		// 2、替换配置文件
 		String replace = "E:\\project\\idea\\git\\data-tunnel-parent\\bin";
@@ -29,7 +29,7 @@ public class Application {
 		content = content.replace(replace, path);
 		IOUtils.write(content, file);
 
-		// 3、运行打包
+		// 3、运行打包，如果不指定maven地址，可以从环境中获取
 		MavenHelper.execute(localPath + "/pom.xml", "install", "G:/apache-maven-3.5.0-alibaba");
 
 		// 4、压缩成tar.gz
@@ -37,7 +37,7 @@ public class Application {
 
 		GanymedSecureShell secureShell = new GanymedSecureShell("120.79.255.186");
 		secureShell.setStopIfAbsent(false);
-		secureShell.login("root", "Ctw130512");
+		secureShell.login("root", "***********");
 		// 5、文件上传
 		secureShell.put(Arrays.asList(path + ".tar.gz"), targetPath);
 		// 6、解压并程序启动. nohup命令是后台运行的，一直无法返回结果，需要定时关闭或使用其他命令
