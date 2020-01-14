@@ -34,14 +34,16 @@ public class Application {
 
 		// 4、压缩成tar.gz
 		MavenHelper.compress(path + ".tar.gz", new File(path).listFiles());
-
 		GanymedSecureShell secureShell = new GanymedSecureShell("120.79.255.186");
 		secureShell.setStopIfAbsent(false);
-		secureShell.login("root", "***********");
+		secureShell.login("root", "**********");
+
 		// 5、文件上传
 		secureShell.put(Arrays.asList(path + ".tar.gz"), targetPath);
 		// 6、解压并程序启动. nohup命令是后台运行的，一直无法返回结果，需要定时关闭或使用其他命令
-		secureShell.execute("cd /data/test" + " && " + "tar -xvf /data/test/bin.tar.gz" + " && " + "nohup java -classpath /data/test/tunnel-test-1.0.0.jar:/data/test/lib/* org.platform.tunnel.test.App > test.log 2>&1");
+
+		secureShell.execute("tar -xvf /data/test/bin.tar.gz -C /data/test");
+		secureShell.execute("nohup java -classpath /data/test/tunnel-test-1.0.0.jar:/data/test/lib/* org.platform.tunnel.test.App >  /data/test/test.log 2>&1");
 		secureShell.close();
 	}
 }

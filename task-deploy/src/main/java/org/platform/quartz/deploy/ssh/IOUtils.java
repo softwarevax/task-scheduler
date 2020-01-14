@@ -63,8 +63,7 @@ public class IOUtils {
     }
 
     public static void write(String content, File file) {
-        try {
-            FileOutputStream os = new FileOutputStream(file);
+        try(FileOutputStream os = new FileOutputStream(file)) {
             os.write(content.getBytes());
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,7 +1,7 @@
 package org.platform.quartz.deploy.ssh.ganymed;
 
+import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.ConnectionMonitor;
 import ch.ethz.ssh2.SCPClient;
 import ch.ethz.ssh2.Session;
 import org.platform.quartz.deploy.ssh.IOUtils;
@@ -38,6 +38,8 @@ public class GanymedSecureShell implements SecureShell, Xftp {
      */
     public static final String DEFAULT_CHARSET = "UTF-8";
 
+    public static final int TIME_OUT = 5 * 1000;
+
     private String ip;
 
     private int port;
@@ -47,8 +49,6 @@ public class GanymedSecureShell implements SecureShell, Xftp {
     private String password;
 
     private Connection connection;
-
-    private Session session;
 
     private SCPClient scpClient;
 
@@ -88,7 +88,6 @@ public class GanymedSecureShell implements SecureShell, Xftp {
             connection = new Connection(this.ip, this.port);
             connection.connect();
             boolean flag = connection.authenticateWithPassword(this.username, this.password);
-            session = connection.openSession();
             scpClient = connection.createSCPClient();
             return flag;
         } catch (IOException e) {
@@ -108,18 +107,72 @@ public class GanymedSecureShell implements SecureShell, Xftp {
      */
     @Override
     public String execute(String cmd) {
+        // 一个session只能执行一个命令
+        Session session = null;
         try {
-            if(session != null) {
+            if(connection != null) {
+                session = connection.openSession();
                 session.execCommand(cmd);
                 InputStream is = session.getStdout();
                 return IOUtils.toString(is, DEFAULT_CHARSET);
             }
         } catch (IOException e) {
-            InputStream err = session.getStderr();
-            logger.error(IOUtils.toString(err, "utf-8"));
+            if(session != null) {
+                InputStream err = session.getStderr();
+                logger.error(IOUtils.toString(err, "utf-8"));
+            }
             logger.error(e.getMessage(), e);
+        } finally {
+            if(session != null) {
+                session.close();
+            }
         }
         return null;
+    }
+
+    /**
+     Session session = secureShell.openBashPTY();
+     InputStream is = new StreamGobbler(session.getStdout());
+     BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(is));
+     PrintWriter out =new PrintWriter(session.getStdin());
+     new Thread(() -> {
+     while (true) {
+     Scanner scanner = new Scanner(System.in);
+     String cmd = scanner.nextLine();
+     if("exit".equals(cmd)) {
+     out.close();
+     System.exit(0);
+     }
+     out.println(cmd);
+     out.flush();
+     }
+     }).start();
+     while (true) {
+     String line = stdoutReader.readLine();
+     if (line == null) {
+     break;
+     }
+     System.out.println(line);
+     }
+     * bash命令
+     * @return
+     */
+    public Session openBashPTY() {
+        Session session = null;
+        try {
+            if(connection != null) {
+                session = connection.openSession();
+                session.requestPTY("bash");
+                session.startShell();
+                session.waitForCondition(ChannelCondition.CLOSED | ChannelCondition.EOF | ChannelCondition.EXIT_STATUS, TIME_OUT);
+            }
+        } catch (IOException e) {
+            if(session != null) {
+                session.close();
+            }
+            logger.error(e.getMessage(), e);
+        }
+        return session;
     }
 
     /**
@@ -129,17 +182,10 @@ public class GanymedSecureShell implements SecureShell, Xftp {
      */
     @Override
     public boolean close() {
-        if(session != null) {
-            session.close();
-        }
         if(connection != null) {
             connection.close();
         }
         return true;
-    }
-
-    public Session getSession() {
-        return session;
     }
 
     /**
@@ -212,5 +258,9 @@ public class GanymedSecureShell implements SecureShell, Xftp {
 
     public void setStopIfAbsent(boolean stopIfAbsent) {
         this.stopIfAbsent = stopIfAbsent;
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 }
