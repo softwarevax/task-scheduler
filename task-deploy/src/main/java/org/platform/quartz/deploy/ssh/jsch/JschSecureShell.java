@@ -16,7 +16,7 @@ public class JschSecureShell {
      String command = "uname -a";
      JSch jsch = new JSch();
      Session session = jsch.getSession("root", "120.79.255.186", 22);
-     session.setPassword("Ctw130512");
+     session.setPassword("********");
      session.setConfig("StrictHostKeyChecking", "no");
      session.connect(60 * 1000);
      Channel channel = session.openChannel("exec");

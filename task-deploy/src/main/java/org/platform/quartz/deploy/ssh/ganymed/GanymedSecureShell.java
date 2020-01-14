@@ -23,7 +23,7 @@ import java.util.List;
     example：
         GanymedSecureShell secureShell = new GanymedSecureShell("120.79.255.186");
         secureShell.setStopIfAbsent(false);
-        secureShell.login("root", "Ctw130512");
+        secureShell.login("root", "*************");
         secureShell.close();
  * @project task-scheduler
  * @classname SecureShell
