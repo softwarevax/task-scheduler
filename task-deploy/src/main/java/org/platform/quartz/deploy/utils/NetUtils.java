@@ -1,4 +1,4 @@
-package org.platform.quartz.deploy.ssh;
+package org.platform.quartz.deploy.utils;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;

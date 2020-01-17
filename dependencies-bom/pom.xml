@@ -27,6 +27,8 @@
         <maven.invoker.version>3.0.1</maven.invoker.version>
         <compress.version>1.19</compress.version>
         <fastjson.version>1.2.47</fastjson.version>
+        <spring.version>5.0.4.RELEASE</spring.version>
+        <schedule.version>1.0.0</schedule.version>
     </properties>
 
     <dependencyManagement>
@@ -96,6 +98,21 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.platform.quartz</groupId>
+                <artifactId>schedule-core</artifactId>
+                <version>${schedule.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.platform.quartz</groupId>
+                <artifactId>task-deploy</artifactId>
+                <version>${schedule.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

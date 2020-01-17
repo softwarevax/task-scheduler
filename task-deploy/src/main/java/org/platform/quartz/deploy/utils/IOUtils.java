@@ -1,4 +1,6 @@
-package org.platform.quartz.deploy.ssh;
+package org.platform.quartz.deploy.utils;
+
+import org.platform.quartz.deploy.utils.StringUtils;
 
 import java.io.*;
 import java.util.ArrayList;

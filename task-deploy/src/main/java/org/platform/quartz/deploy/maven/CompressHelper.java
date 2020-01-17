@@ -16,20 +16,7 @@ import java.util.Arrays;
  * @classname MavenHelper
  * @date 2020/1/13 15:22
  */
-public class MavenHelper {
-
-    public static final void execute(String pomPath, String cmd, String mavenPath) {
-        InvocationRequest request = new DefaultInvocationRequest();
-        request.setPomFile( new File( pomPath) );
-        request.setGoals(Arrays.asList(cmd) ); //maven 命令
-        Invoker invoker = new DefaultInvoker();
-        invoker.setMavenHome(new File(mavenPath));
-        try {
-            invoker.execute( request );
-        } catch (MavenInvocationException e) {
-            e.printStackTrace();
-        }
-    }
+public class CompressHelper {
 
     public static final void compress(String destFileName, File... files) {
         try {

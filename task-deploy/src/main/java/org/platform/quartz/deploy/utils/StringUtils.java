@@ -1,4 +1,4 @@
-package org.platform.quartz.deploy.ssh;
+package org.platform.quartz.deploy.utils;
 
 /**
  * @author twcao
@@ -27,4 +27,12 @@ public class StringUtils {
         }
         return false;
     }
+
+    public static final String substr(String str, int spos, int epos) {
+        if(StringUtils.isBlank(str)) {
+            return str;
+        }
+        return str.substring(spos, epos);
+    }
+
 }
