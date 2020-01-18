@@ -11,7 +11,7 @@
  Target Server Version : 50717
  File Encoding         : 65001
 
- Date: 10/01/2020 15:04:47
+ Date: 18/01/2020 18:51:48
 */
 
 SET NAMES utf8mb4;
@@ -55,6 +55,69 @@ CREATE TABLE `qrtz_cron_triggers`  (
   PRIMARY KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) USING BTREE,
   CONSTRAINT `qrtz_cron_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for qrtz_deploy_configure
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_deploy_configure`;
+CREATE TABLE `qrtz_deploy_configure`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `key` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `value` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of qrtz_deploy_configure
+-- ----------------------------
+INSERT INTO `qrtz_deploy_configure` VALUES (1, '部署根目录', 'deploy.workspace', 'D:\\tmp\\source_codes', 'property', '项目部署的代码存放位置');
+
+-- ----------------------------
+-- Table structure for qrtz_deploy_task
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_deploy_task`;
+CREATE TABLE `qrtz_deploy_task`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `task_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '',
+  `task_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '',
+  `option_id` varchar(11) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '',
+  `property_key` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '',
+  `property_value` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '',
+  `fqn` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '',
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '',
+  `user_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT '',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of qrtz_deploy_task
+-- ----------------------------
+INSERT INTO `qrtz_deploy_task` VALUES (1, '1', 'data-tunnel-parent', '7', 'deploy.run.step[1]', 'cd /data/test/ && chmod 777 deploy.sh && ./deploy.sh start', 'org.platform.quartz.deploy.deploy.option.LinuxRun', NULL, '1');
+INSERT INTO `qrtz_deploy_task` VALUES (2, '1', 'data-tunnel-parent', '7', 'deploy.run.step[0]', 'tar -xvf /data/test/bin.tar.gz -C /data/test', 'org.platform.quartz.deploy.deploy.option.LinuxRun', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (3, '1', 'data-tunnel-parent', '2', 'deploy.replace.file.path', 'pom.xml', 'org.platform.quartz.deploy.deploy.option.FileReplace', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (4, '1', 'data-tunnel-parent', '2', 'deploy.replace.old', 'E:\\project\\idea\\git\\data-tunnel-parent\\bin', 'org.platform.quartz.deploy.deploy.option.FileReplace', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (5, '1', 'data-tunnel-parent', '2', 'deploy.replace.target', 'D:\\tmp\\source_codes\\data-tunnel-parent\\bin', 'org.platform.quartz.deploy.deploy.option.FileReplace', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (6, '1', 'data-tunnel-parent', '2', 'deploy.replace.filter.file.name', '', 'org.platform.quartz.deploy.deploy.option.FileReplace', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (7, '1', 'data-tunnel-parent', '6', 'deploy.upload.target.hostname', '120.79.255.186', 'org.platform.quartz.deploy.deploy.option.LinuxRun', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (8, '1', 'data-tunnel-parent', '6', 'deploy.upload.target.username', 'root', 'org.platform.quartz.deploy.deploy.option.LinuxRun', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (9, '1', 'data-tunnel-parent', '6', 'deploy.upload.target.password', '*************', 'org.platform.quartz.deploy.deploy.option.LinuxRun', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (10, '1', 'data-tunnel-parent', '3', 'deploy.maven.root.path', 'G:/apache-maven-3.5.0-alibaba', 'org.platform.quartz.deploy.deploy.option.MavenPack', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (11, '1', 'data-tunnel-parent', '3', 'deploy.maven.cmd', 'mvn install', 'org.platform.quartz.deploy.deploy.option.MavenPack', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (12, '1', 'data-tunnel-parent', '3', 'deploy.maven.pom.path', 'pom.xml', 'org.platform.quartz.deploy.deploy.option.MavenPack', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (13, '1', 'data-tunnel-parent', '5', 'deploy.compress.enable', 'true', 'org.platform.quartz.deploy.deploy.option.TarArchiveCompress', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (14, '1', 'data-tunnel-parent', '5', 'deploy.compress.suffix', 'tar.gz', 'org.platform.quartz.deploy.deploy.option.TarArchiveCompress', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (15, '1', 'data-tunnel-parent', '5', 'deploy.compress.source.path', 'D:\\tmp\\source_codes\\data-tunnel-parent\\bin', 'org.platform.quartz.deploy.deploy.option.TarArchiveCompress', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (16, '1', 'data-tunnel-parent', '5', 'deploy.compress.target.path', 'D:\\tmp\\source_codes', 'org.platform.quartz.deploy.deploy.option.TarArchiveCompress', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (17, '1', 'data-tunnel-parent', '6', 'deploy.upload.target.outcome.path', '/data/test', 'org.platform.quartz.deploy.deploy.option.LinuxUpload', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (18, '1', 'data-tunnel-parent', '1', 'deploy.git.repository.http.uri', 'https://github.com/softwarevax/data-tunnel-parent.git', 'org.platform.quartz.deploy.deploy.option.GitFetch', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (19, '1', 'data-tunnel-parent', '1', 'deploy.git.repository.branch', 'master', 'org.platform.quartz.deploy.deploy.option.GitFetch', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (20, '1', 'data-tunnel-parent', '1', 'deploy.git.username', 'softwarevax', 'org.platform.quartz.deploy.deploy.option.GitFetch', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (21, '1', 'data-tunnel-parent', '1', 'deploy.git.password', '*******', 'org.platform.quartz.deploy.deploy.option.GitFetch', '', '1');
+INSERT INTO `qrtz_deploy_task` VALUES (31, '1', 'data-tunnel-parent', '0', NULL, NULL, 'org.platform.quartz.deploy.deploy.option.DeployInit', NULL, '1');
+INSERT INTO `qrtz_deploy_task` VALUES (32, '1', 'data-tunnel-parent', '4', '', '', 'org.platform.quartz.deploy.deploy.option.FileFilter', '', '');
 
 -- ----------------------------
 -- Table structure for qrtz_fired_triggers

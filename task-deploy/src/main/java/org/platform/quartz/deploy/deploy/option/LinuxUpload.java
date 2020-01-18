@@ -17,10 +17,11 @@ public class LinuxUpload implements Upload {
     @Override
     public void execute(Context ctx) {
         String codePath = ctx.getString("tmp.code.path");
-        GanymedSecureShell secureShell = new GanymedSecureShell(ctx.getString("deploy.target.hostname"));
+        GanymedSecureShell secureShell = new GanymedSecureShell(ctx.getString("deploy.upload.target.hostname"));
         secureShell.setStopIfAbsent(false);
-        secureShell.login(ctx.getString("deploy.target.username"), ctx.getString("deploy.target.password"));
-        secureShell.put(Arrays.asList(codePath + "." + ctx.getString("deploy.file.compress.suffix")), ctx.getString("deploy.target.outcome.path"));
+        secureShell.login(ctx.getString("deploy.upload.target.username"), ctx.getString("deploy.upload.target.password"));
+        String compressFile = ctx.getString("tmp.compress.target.file");
+        secureShell.put(Arrays.asList(compressFile), ctx.getString("deploy.upload.target.outcome.path"));
         secureShell.close();
     }
 

@@ -1,19 +1,13 @@
 package org.platform.quartz.deploy;
 
-import org.platform.quartz.deploy.deploy.AbstractDeploy;
-import org.platform.quartz.deploy.deploy.Context;
-import org.platform.quartz.deploy.deploy.Deploy;
-import org.platform.quartz.deploy.deploy.DeployFactory;
-import org.platform.quartz.deploy.deploy.option.*;
-import org.platform.quartz.deploy.utils.PropertyUtils;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
+@SpringBootApplication
 public class Application {
 
 	public static void main(String[] args) {
-
+		SpringApplication.run(Application.class, args);
 	}
+
 }

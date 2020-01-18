@@ -14,10 +14,10 @@ public class LinuxRun implements Run {
 
     @Override
     public void execute(Context ctx) {
-        GanymedSecureShell secureShell = new GanymedSecureShell(ctx.getString("deploy.target.hostname"));
-        secureShell.login(ctx.getString("deploy.target.username"), ctx.getString("deploy.target.password"));
-        secureShell.execute(ctx.getString("deploy.subsequent.step[0]"));
-        secureShell.execute(ctx.getString("deploy.subsequent.step[1]"));
+        GanymedSecureShell secureShell = new GanymedSecureShell(ctx.getString("deploy.upload.target.hostname"));
+        secureShell.login(ctx.getString("deploy.upload.target.username"), ctx.getString("deploy.upload.target.password"));
+        secureShell.execute(ctx.getString("deploy.run.step[0]"));
+        secureShell.execute(ctx.getString("deploy.run.step[1]"));
         secureShell.close();
     }
 

@@ -1,6 +1,8 @@
 package org.platform.quartz.deploy.deploy.option;
 
 import org.platform.quartz.deploy.deploy.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author twcao
@@ -11,9 +13,11 @@ import org.platform.quartz.deploy.deploy.Context;
  */
 public class DeployInit implements Init {
 
+    public final Logger logger = LoggerFactory.getLogger(DeployInit.class);
+
     @Override
     public void execute(Context ctx) {
-
+        logger.info("部署初始化。。。");
     }
 
     @Override

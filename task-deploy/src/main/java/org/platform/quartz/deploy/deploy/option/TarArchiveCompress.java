@@ -16,12 +16,15 @@ public class TarArchiveCompress implements Compress {
 
     @Override
     public void execute(Context ctx) {
-        if(!Boolean.parseBoolean(ctx.getString("deploy.file.compress"))) {
+        if(!Boolean.parseBoolean(ctx.getString("deploy.compress.enable"))) {
             return;
         }
-        String targetPath = ctx.getString("deploy.file.compress.target.path");
-        String sourcePath = ctx.getString("deploy.file.compress.source.path");
-        CompressHelper.compress(targetPath + "." + ctx.getString("deploy.file.compress.suffix"), new File(sourcePath).listFiles());
+        String targetPath = ctx.getString("deploy.compress.target.path");
+        String sourcePath = ctx.getString("deploy.compress.source.path");
+        String compressFileName = sourcePath.substring(sourcePath.lastIndexOf(File.separator));
+        String tmpCompressFile = targetPath + File.separator + compressFileName + "." + ctx.getString("deploy.compress.suffix");
+        ctx.put("tmp.compress.target.file", tmpCompressFile);
+        CompressHelper.compress(tmpCompressFile, new File(sourcePath).listFiles());
     }
 
     @Override

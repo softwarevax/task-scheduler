@@ -2,6 +2,8 @@ package org.platform.quartz.deploy.maven;
 
 import org.apache.maven.shared.invoker.*;
 import org.platform.quartz.deploy.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Arrays;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
  * @date 2020/1/16 9:53
  */
 public class MavenPackage implements Package {
+
+    public static final Logger logger = LoggerFactory.getLogger(MavenPackage.class);
 
     private String pomPath;
 

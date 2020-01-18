@@ -5,6 +5,8 @@ import org.platform.quartz.deploy.replace.DeployReplaceConfig;
 import org.platform.quartz.deploy.replace.DeployReplaceHandler;
 import org.platform.quartz.deploy.replace.ReplaceHandle;
 import org.platform.quartz.deploy.replace.ReplaceStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author twcao
@@ -15,20 +17,23 @@ import org.platform.quartz.deploy.replace.ReplaceStep;
  */
 public class FileReplace implements Replace {
 
+    public final Logger logger = LoggerFactory.getLogger(FileReplace.class);
+
     @Override
     public void execute(Context ctx) {
         String codePath = ctx.getString("tmp.code.path");
         ReplaceStep step = new DeployReplaceConfig(
-                codePath, ctx.getString("git.deploy.replace.file.path"),
-                ctx.getString("git.deploy.replace.old"),
-                ctx.getString("git.deploy.replace.target"),
-                ctx.getString("git.deploy.replace.filter.file.name"),
+                codePath, ctx.getString("deploy.replace.file.path"),
+                ctx.getString("deploy.replace.old"),
+                ctx.getString("deploy.replace.target"),
+                ctx.getString("deploy.replace.filter.file.name"),
                 1
         );
 
         ReplaceHandle handle = new DeployReplaceHandler();
         handle.addStep(step);
         handle.doReplace();
+        logger.info("文件替换完成");
     }
 
     @Override
