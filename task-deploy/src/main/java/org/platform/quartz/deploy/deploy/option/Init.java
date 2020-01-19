@@ -11,4 +11,9 @@ import org.platform.quartz.deploy.replace.Order;
  * @date 2020/1/17 12:44
  */
 public interface Init extends Order, Deploy {
+
+    @Override
+    default int getOrder() {
+        return 0;
+    }
 }

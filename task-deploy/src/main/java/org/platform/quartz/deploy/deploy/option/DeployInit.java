@@ -19,9 +19,4 @@ public class DeployInit implements Init {
     public void execute(Context ctx) {
         logger.info("部署初始化。。。");
     }
-
-    @Override
-    public int getOrder() {
-        return 0;
-    }
 }

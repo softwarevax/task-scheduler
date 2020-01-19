@@ -1,5 +1,7 @@
 package org.platform.quartz.deploy.deploy;
 
+import org.platform.quartz.deploy.utils.StringUtils;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -140,6 +142,26 @@ public class Context {
      */
     public void putAll(Map<String, String> map) {
         this.parameters.putAll(map);
+    }
+
+    /**
+     * 根据前缀获取
+     * @param prefix
+     * @return
+     */
+    public Map<String, String> getPrefix(String prefix) {
+        Map<String, String> map = new HashMap<>();
+        Iterator<String> iterator = this.parameters.keySet().iterator();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            if(StringUtils.isBlank(key)) {
+                continue;
+            }
+            if(key.startsWith(prefix)) {
+                map.put(key, this.parameters.get(key));
+            }
+        }
+        return map;
     }
 
     /**

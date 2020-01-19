@@ -4,10 +4,10 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.maven.shared.invoker.*;
+import org.springframework.util.CollectionUtils;
 
 import java.io.*;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author twcao
@@ -18,13 +18,23 @@ import java.util.Arrays;
  */
 public class CompressHelper {
 
+    public static final void compress(String destFileName, List<String> files) {
+        if(CollectionUtils.isEmpty(files)) {
+            return;
+        }
+        File[] file = new File[files.size()];
+        for(int i = 0, len = file.length; i < len; i++) {
+            file[i] = new File(files.get(i));
+        }
+        compress(destFileName, file);
+    }
+
     public static final void compress(String destFileName, File... files) {
         try {
             File destFile = new File(destFileName);
             if (destFile.exists()) {
                 FileUtils.forceDelete(destFile);
             }
-
             try (FileOutputStream fileOutputStream = new FileOutputStream(destFile);
                  BufferedOutputStream bufferedWriter = new BufferedOutputStream(fileOutputStream);
                  TarArchiveOutputStream tar = new TarArchiveOutputStream(bufferedWriter)) {

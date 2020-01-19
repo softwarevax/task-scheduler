@@ -11,4 +11,10 @@ import org.platform.quartz.deploy.replace.Order;
  * @date 2020/1/17 12:48
  */
 public interface Compress extends Order, Deploy {
+
+    @Override
+    default int getOrder() {
+        return 5;
+    }
+
 }

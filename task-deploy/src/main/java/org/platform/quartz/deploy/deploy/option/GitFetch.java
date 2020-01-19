@@ -31,12 +31,12 @@ public class GitFetch implements Fetch {
         String branch = ctx.getString("deploy.git.repository.branch");
         String username = ctx.getString("deploy.git.username");
         String password = ctx.getString("deploy.git.password");
-        String workspace = ctx.getString("deploy.workspace");
+        String workSpace = ctx.getString("deploy.workspace");
         Repository repo = new GitRepository.Builder().uri(uri)
                 .branch(branch)
                 .userName(username)
                 .password(password)
-                .workSpace(workspace).build();
+                .workSpace(workSpace).build();
         boolean success = repo.fetch();
         logger.info("代码拉取结果: {}", success);
         String codePath = repo.getSourcePath();
@@ -46,10 +46,5 @@ public class GitFetch implements Fetch {
     @Override
     public void setListener(DeployListener listener) {
         this.listener = listener;
-    }
-
-    @Override
-    public int getOrder() {
-        return 1;
     }
 }

@@ -1,8 +1,6 @@
 package org.platform.quartz.deploy.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +82,11 @@ public class FileUtils {
         return replaceFile(fileName, old, replace, "utf-8");
     }
 
+    /**
+     * 获取目录下的所有文件名称
+     * @param filePath
+     * @param fileList
+     */
     public static void files(String filePath, List<String> fileList) {
         File file = new File(filePath);
         if(file.isFile()) {
@@ -93,6 +96,91 @@ public class FileUtils {
         File[] files = file.listFiles();
         for(File f : files) {
             files(f.getAbsolutePath(), fileList);
+        }
+    }
+
+    /**
+     * 复制文件夹
+     * @param resource
+     * @param target
+     */
+    public static void copyFolder(String resource, String target) {
+        File resourceFile = new File(resource);
+        if (!resourceFile.exists()) {
+            return;
+        }
+        File targetFile = new File(target);
+        if (!targetFile.exists()) {
+           return;
+        }
+        // 获取源文件夹下的文件夹或文件
+        File[] resourceFiles = resourceFile.listFiles();
+        for (File file : resourceFiles) {
+            File file1 = new File(targetFile.getAbsolutePath() + File.separator + resourceFile.getName());
+            // 复制文件
+            if (file.isFile()) {
+                // 在 目标文件夹（B） 中 新建 源文件夹（A），然后将文件复制到 A 中
+                // 这样 在 B 中 就存在 A
+                if (!file1.exists()) {
+                    file1.mkdirs();
+                }
+                File targetFile1 = new File(file1.getAbsolutePath() + File.separator + file.getName());
+                copyFile(file, targetFile1);
+            }
+            // 复制文件夹
+            if (file.isDirectory()) {// 复制源文件夹
+                String dir1 = file.getAbsolutePath();
+                // 目的文件夹
+                String dir2 = file1.getAbsolutePath();
+                copyFolder(dir1, dir2);
+            }
+        }
+    }
+
+    /**
+     * 复制文件
+     *
+     * @param resource
+     * @param target
+     */
+    public static void copyFile(File resource, File target) {
+        try {
+            // 输入流 --> 从一个目标读取数据
+            // 输出流 --> 向一个目标写入数据
+            // 文件输入流并进行缓冲
+            FileInputStream inputStream = new FileInputStream(resource);
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+            // 文件输出流并进行缓冲
+            FileOutputStream outputStream = new FileOutputStream(target);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+            // 缓冲数组
+            // 大文件 可将 1024 * 2 改大一些，但是 并不是越大就越快
+            byte[] bytes = new byte[1024 * 2];
+            int len = 0;
+            while ((len = inputStream.read(bytes)) != -1) {
+                bufferedOutputStream.write(bytes, 0, len);
+            }
+            // 刷新输出缓冲流
+            bufferedOutputStream.flush();
+            //关闭流
+            bufferedInputStream.close();
+            bufferedOutputStream.close();
+            inputStream.close();
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 强制删除文件
+     * @param path
+     */
+    public static void forceDelete(String path) {
+        try {
+            org.apache.commons.io.FileUtils.forceDelete(new File(path));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
