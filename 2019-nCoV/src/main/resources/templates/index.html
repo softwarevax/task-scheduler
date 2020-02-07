@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>2019-nCoV</title>
+    <!-- 引入 ECharts 文件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.6.0/echarts.min.js"></script>
+    <style>
+        #contain {
+            width: 100%;
+            height: 100%;
+        }
+        #option {
+            margin: 25px auto;
+            width: 1200px;
+            height: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div id="contain">
+        <div id="option">
+        </div>
+        <!--<div id="confirmedNum" style="width: 600px;height:400px;"></div>
+        <div id="suspectedNum" style="width: 600px;height:400px;"></div>
+        <div id="curesNum" style="width: 600px;height:400px;"></div>
+        <div id="deathsNum" style="width: 600px;height:400px;"></div>-->
+    </div>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+
+    var  contextPath = getContextPath();
+    var option, chart;
+    $(function() {
+        chart = echarts.init(document.getElementById("option"));
+        fetch(chart);
+        openSocket(chart);
+    });
+
+    function openSocket(chart) {
+        var socket;
+        if(typeof(WebSocket) == "undefined") {
+            console.log("您的浏览器不支持WebSocket");
+        }else{
+            if(socket!=null){
+                socket.close();
+                socket=null;
+            }
+            socket = new WebSocket("ws://" + window.location.host  + contextPath + "/ws/ncov");
+            //打开事件
+            socket.onopen = function() {
+                console.log("websocket已打开");
+                //socket.send("这是来自客户端的消息" + location.href + new Date());
+            };
+            //获得消息事件
+            socket.onmessage = function(msg) {
+                if(!option || !msg || !msg.data) {
+                    return;
+                }
+                var data = JSON.parse(msg.data);
+                var lastDate = option.xAxis.data;
+                lastDate = lastDate[lastDate.length - 1]; //获取 最后一天的日期
+                var newestDate = data.date;
+                var series = option.series;
+                var confirmedNums = series[0].data, suspectedNums = series[1].data, curesNums = series[2].data, deathsNums = series[3].data;
+                if(lastDate == newestDate) {
+                    //如果日期没变，则替换最后一条数据
+                    confirmedNums[confirmedNums.length - 1] = data.confirmedNum;
+                    suspectedNums[suspectedNums.length - 1] = data.suspectedNum;
+                    curesNums[curesNums.length - 1] = data.curesNum;
+                    deathsNums[deathsNums.length - 1] = data.deathsNum;
+                    series[0].data = confirmedNums;
+                    series[1].data = suspectedNums;
+                    series[2].data = curesNums;
+                    series[3].data = deathsNums;
+                } else {
+                    //否则新增一条数据
+                    series[0].data.push(data.confirmedNum);
+                    series[1].data.push(data.suspectedNum);
+                    series[2].data.push(data.curesNum);
+                    series[3].data.push(data.deathsNum);
+                    option.xAxis.data.push(newestDate);
+                }
+                option.series  = series;
+                chart.setOption(option);
+            };
+            //关闭事件
+            socket.onclose = function() {
+                console.log("websocket已关闭");
+            };
+            //发生了错误事件
+            socket.onerror = function() {
+                console.log("websocket发生了错误");
+            }
+        }
+    }
+
+    function fetch(chart) {
+        var confirmedNums = [], suspectedNums = [], curesNums = [], deathsNums = [], dates = [], datas = [];
+        // 指定图表的配置项和数据
+        $.get(contextPath + "/history", function(result) {
+            var _chart  = chart;
+            $.each(result, function (index,item) {
+                dates.push(item.date);
+                confirmedNums.push(item.confirmedNum);
+                datas.push(confirmedNums);
+                suspectedNums.push(item.suspectedNum);
+                datas.push(suspectedNums);
+                curesNums.push(item.curesNum);
+                datas.push(curesNums);
+                deathsNums.push(item.deathsNum);
+                datas.push(deathsNums);
+                render(_chart, dates, datas);
+            })
+        });
+    }
+
+    function render(chart, dates, datas) {
+        var legend = ['确诊病例', '疑似病例', '治愈人数', '死亡人数'];
+        option = {
+            title: {
+                text: '2019-nCoV疫情实时数据'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: legend
+            },
+            grid: {
+                left: '3%',
+                right: '12%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: dates,
+                axisLabel: {
+                    formatter: function(value){
+                        return value.slice(value.length - 5, value.length);
+                    }
+                }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: legend[0],
+                    type: 'line',
+                    data: datas[0]
+                },
+                {
+                    name: legend[1],
+                    type: 'line',
+                    data: datas[1]
+                },
+                {
+                    name: legend[2],
+                    type: 'line',
+                    data: datas[2]
+                },
+                {
+                    name: legend[3],
+                    type: 'line',
+                    data: datas[3]
+                }
+            ]
+        };
+        chart.setOption(option);
+    }
+
+    function getContextPath() {
+        var pathName = document.location.pathname;
+        var index = pathName.substr(1).indexOf("/");
+        var contextPath = pathName.substr(0,index+1);
+        return contextPath;
+    }
+</script>
+</body>
+</html>
