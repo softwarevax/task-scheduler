@@ -57,18 +57,24 @@
                 if(!option || !msg || !msg.data) {
                     return;
                 }
+                // 需要更新的数据
                 var data = JSON.parse(msg.data);
-                var lastDate = option.xAxis.data;
-                lastDate = lastDate[lastDate.length - 1]; //获取 最后一天的日期
-                var newestDate = data.date;
+                // x轴的日期集合
+                var xAxis = option.xAxis.data;
+                var idx = -1; //需要数据的日期索引
+                var updateDate = data.date; // 需要修改的数据的日期
+                $.each(xAxis, function (i, item) {
+                    if(item == updateDate) {
+                        idx = i;
+                    }
+                });
                 var series = option.series;
                 var confirmedNums = series[0].data, suspectedNums = series[1].data, curesNums = series[2].data, deathsNums = series[3].data;
-                if(lastDate == newestDate) {
-                    //如果日期没变，则替换最后一条数据
-                    confirmedNums[confirmedNums.length - 1] = data.confirmedNum;
-                    suspectedNums[suspectedNums.length - 1] = data.suspectedNum;
-                    curesNums[curesNums.length - 1] = data.curesNum;
-                    deathsNums[deathsNums.length - 1] = data.deathsNum;
+                if(idx > -1) {
+                    confirmedNums[idx] = data.confirmedNum;
+                    suspectedNums[idx] = data.suspectedNum;
+                    curesNums[idx] = data.curesNum;
+                    deathsNums[idx] = data.deathsNum;
                     series[0].data = confirmedNums;
                     series[1].data = suspectedNums;
                     series[2].data = curesNums;
@@ -79,7 +85,7 @@
                     series[1].data.push(data.suspectedNum);
                     series[2].data.push(data.curesNum);
                     series[3].data.push(data.deathsNum);
-                    option.xAxis.data.push(newestDate);
+                    option.xAxis.data.push(updateDate);
                 }
                 option.series  = series;
                 chart.setOption(option);
