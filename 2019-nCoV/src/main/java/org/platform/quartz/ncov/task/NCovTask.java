@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,9 @@ public class NCovTask {
         histories.add(today);
         historyService.saveOrUpdate(histories);
         List<Area> areas = data.getArea();
+        if(CollectionUtils.isEmpty(areas)) {
+            return;
+        }
         for (Area area : areas) {
             NcovVo vo = new NcovVo();
             vo.setAreaName(area.getProvinceName());
