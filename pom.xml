@@ -14,7 +14,6 @@
 		<module>task-schedule</module>
 		<module>schedule-web</module>
 		<module>task-deploy</module>
-		<module>2019-nCoV</module>
 	</modules>
 
 	<properties>

@@ -22,10 +22,10 @@ public class LinuxRun implements Run {
     public static final String PROPERTY_PREFIX = "deploy.run";
 
     @Override
-    public void execute(Context ctx) {
+    public boolean execute(Context ctx) {
         Map<String, String> properties = ctx.getPrefix(PROPERTY_PREFIX);
         if(CollectionUtils.isEmpty(properties)) {
-            return;
+            return false;
         }
         Collection<String> keys = properties.keySet();
         List<String> steps = new ArrayList<>(keys);
@@ -39,5 +39,6 @@ public class LinuxRun implements Run {
             logger.info("远程命令 {} 执行完成", ctx.getString("deploy.run.step[" + idx + "]"));
         }
         secureShell.close();
+        return true;
     }
 }

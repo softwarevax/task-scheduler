@@ -5,6 +5,7 @@ import org.platform.quartz.deploy.replace.DeployReplaceConfig;
 import org.platform.quartz.deploy.replace.DeployReplaceHandler;
 import org.platform.quartz.deploy.replace.ReplaceHandle;
 import org.platform.quartz.deploy.replace.ReplaceStep;
+import org.platform.quartz.deploy.utils.Constants;
 import org.platform.quartz.deploy.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,40 +26,34 @@ public class FileReplace implements Replace {
 
     public static final Logger logger = LoggerFactory.getLogger(FileReplace.class);
 
-    public static final String PROPERTY_PREFIX = "deploy.replace";
-
     @Override
-    public void execute(Context ctx) {
-        String codePath = ctx.getString("tmp.code.path");
+    public boolean execute(Context ctx) {
+        String codePath = ctx.getString(Constants.TMP_PROJECT_SOURCE_CODE_PATH);
         if(StringUtils.isBlank(codePath)) {
-            logger.error("代码路径不存在, 请确认代码已拉取成功");
+            logger.error("The code path does not exist. Please confirm that the code has pulled successfully");
+            return false;
         }
-        // 当前操作的所有属性
-        Map<String, String> properties = ctx.getPrefix(PROPERTY_PREFIX);
-        Map<String, List<String>> groupBy = properties.keySet().stream().collect(Collectors.groupingBy(key -> key.substring(0, key.indexOf('.', 10))));
+        // all properties of the current operation
+        Map<String, String> properties = ctx.getPrefix(Constants.FileReplace.PROPERTY_PREFIX);
+        Map<String, List<String>> groupBy = properties.keySet().stream().collect(Collectors.groupingBy(key -> key.substring(0, key.indexOf("]") + 1)));
         Iterator<Map.Entry<String, List<String>>> iterator = groupBy.entrySet().iterator();
         ReplaceHandle handle = new DeployReplaceHandler();
         while (iterator.hasNext()) {
             Map.Entry<String, List<String>> entry = iterator.next();
-            List<String> values = entry.getValue();
             String key = entry.getKey();
             int idx = Integer.valueOf(entry.getKey().substring(key.indexOf("[") + 1, key.indexOf("]")));
-            ReplaceStep step = null;
-            for(int i = 0, len = values.size(); i < len; i++) {
-                step = new DeployReplaceConfig(
-                        codePath, ctx.getString("deploy.replace[" + idx  + "].file.path"),
-                        ctx.getString("deploy.replace[" + idx + "].old"),
-                        ctx.getString("deploy.replace[" + idx + "].target"),
-                        ctx.getString("deploy.replace[" + idx + "].filter.file.name"),
-                        idx
-                );
-            }
+            ReplaceStep step = new DeployReplaceConfig(
+                codePath, ctx.getString(Constants.FileReplace.PROPERTY_PREFIX + "[" + idx  + "]." + Constants.FileReplace.SUFFIX_FILE_PATH),
+                ctx.getString(Constants.FileReplace.PROPERTY_PREFIX + "[" + idx + "]." + Constants.FileReplace.SUFFIX_OLD),
+                ctx.getString(Constants.FileReplace.PROPERTY_PREFIX + "[" + idx + "]." + Constants.FileReplace.SUFFIX_TARGET),
+                ctx.getString(Constants.FileReplace.PROPERTY_PREFIX + "[" + idx + "]." + Constants.FileReplace.SUFFIX_FILTER_FILE_NAME),
+                idx
+            );
             if(step == null) {
                 continue;
             }
             handle.addStep(step);
         }
-        boolean flag = handle.doReplace();
-        logger.info("文件替换完成, 替换结果 = {}", flag);
+        return handle.doReplace();
     }
 }

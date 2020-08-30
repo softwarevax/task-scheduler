@@ -36,4 +36,6 @@ public class TaskDeployEntity {
     private String remark;
 
     private String userId;
+
+    private String enabled;
 }

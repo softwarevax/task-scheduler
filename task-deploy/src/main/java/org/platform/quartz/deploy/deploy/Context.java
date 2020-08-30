@@ -41,7 +41,7 @@ public class Context {
      * @param key
      * @return
      */
-    public Boolean	getBoolean(String key) {
+    public Boolean getBoolean(String key) {
         return getBoolean(key, null);
     }
 
@@ -51,8 +51,12 @@ public class Context {
      * @param defaultValue
      * @return
      */
-    public Boolean	getBoolean(String key, Boolean defaultValue) {
-        return get(key, defaultValue);
+    public Boolean getBoolean(String key, Boolean defaultValue) {
+        try {
+            return Boolean.parseBoolean(this.parameters.get(key));
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     /**
@@ -60,7 +64,7 @@ public class Context {
      * @param key
      * @return
      */
-    public Integer	getInteger(String key) {
+    public Integer getInteger(String key) {
         return get(key, null);
     }
 
@@ -70,7 +74,7 @@ public class Context {
      * @param defaultValue
      * @return
      */
-    public Integer	getInteger(String key, Integer defaultValue) {
+    public Integer getInteger(String key, Integer defaultValue) {
         return get(key, defaultValue);
     }
 

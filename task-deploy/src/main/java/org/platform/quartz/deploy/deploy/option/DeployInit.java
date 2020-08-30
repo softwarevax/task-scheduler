@@ -16,7 +16,8 @@ public class DeployInit implements Init {
     public final Logger logger = LoggerFactory.getLogger(DeployInit.class);
 
     @Override
-    public void execute(Context ctx) {
+    public boolean execute(Context ctx) {
         logger.info("部署初始化。。。");
+        return true;
     }
 }

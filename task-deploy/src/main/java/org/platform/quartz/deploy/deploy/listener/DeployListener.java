@@ -13,7 +13,15 @@ import java.util.EventListener;
  */
 public interface DeployListener extends EventListener {
 
+    /**
+     * do something before execute deploy unit
+     * @param ctx
+     */
     void before(Context ctx);
 
+    /**
+     * do something after execute deploy unit
+     * @param ctx
+     */
     void after(Context ctx);
 }

@@ -1,5 +1,6 @@
 package org.platform.quartz.deploy.deploy;
 
+import lombok.extern.slf4j.Slf4j;
 import org.platform.quartz.deploy.deploy.listener.DeployListener;
 import org.springframework.util.CollectionUtils;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * @classname AbstractDeploy
  * @date 2020/1/17 11:43
  */
+@Slf4j
 public abstract class AbstractDeploy implements Deploy {
 
     protected Context ctx;
@@ -25,16 +27,15 @@ public abstract class AbstractDeploy implements Deploy {
     }
 
     public AbstractDeploy(Context ctx) {
-        super();
         this.ctx = ctx;
     }
 
     @Override
-    public void execute(Context ctx) {
+    public boolean execute(Context ctx) {
         if(CollectionUtils.isEmpty(deploys)) {
-            return;
+            return false;
         }
-        deploys.stream().sorted(Comparator.comparing(Deploy::getOrder));
+        deploys.sort(Comparator.comparing(Deploy::getOrder));
         for(Deploy deploy : deploys) {
             DeployListener listener = deploy.getListener();
             if(listener != null) {
@@ -43,8 +44,9 @@ public abstract class AbstractDeploy implements Deploy {
                 listener.after(ctx);
                 continue;
             }
-            deploy.execute(ctx);
+            log.info("{}, result = {}", deploy.getClass(), deploy.execute(ctx));
         }
+        return true;
     }
 
     public void addDeploy(List<Deploy> deploys) {

@@ -2,6 +2,8 @@ package org.platform.quartz.deploy.web.dao;
 
 import org.platform.quartz.deploy.web.entity.TaskDeployEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,5 +18,6 @@ import java.util.List;
 @Repository
 public interface TaskDeployDao extends JpaRepository<TaskDeployEntity, Integer> {
 
-    List<TaskDeployEntity> findByTaskId(int taskId);
+    @Query("FROM TaskDeployEntity WHERE taskId = :taskId and enabled = 1")
+    List<TaskDeployEntity> findByTaskId(@Param("taskId")int taskId);
 }

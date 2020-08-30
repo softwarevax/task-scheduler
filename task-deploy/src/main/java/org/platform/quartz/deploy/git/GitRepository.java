@@ -111,13 +111,12 @@ public class GitRepository implements Repository {
                 }
                 git.getRepository().getConfig().setInt(HttpConfig.HTTP, null, HttpConfig.POST_BUFFER_KEY, 512*1024*1024);
                 git.pull().setRemoteBranchName(this.branch).setCredentialsProvider(credentialsProvider).call();
-                logger.info("code at {} had update", getSourcePath());
                 git.close();
                 return true;
             }
             throw new DeployConfigureException("git only support https repository");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return false;
         }
     }

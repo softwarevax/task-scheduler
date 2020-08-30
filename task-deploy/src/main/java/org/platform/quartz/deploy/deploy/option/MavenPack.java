@@ -3,6 +3,8 @@ package org.platform.quartz.deploy.deploy.option;
 import org.platform.quartz.deploy.deploy.Context;
 import org.platform.quartz.deploy.maven.MavenPackage;
 import org.platform.quartz.deploy.maven.Package;
+import org.platform.quartz.deploy.utils.Constants;
+import org.platform.quartz.deploy.utils.Constants.Maven;
 import org.platform.quartz.deploy.utils.FileUtils;
 import org.platform.quartz.deploy.utils.StringUtils;
 import org.slf4j.Logger;
@@ -20,16 +22,17 @@ public class MavenPack implements Pack {
     public final Logger logger = LoggerFactory.getLogger(MavenPack.class);
 
     @Override
-    public void execute(Context ctx) {
-        String codePath = ctx.getString("tmp.code.path");
+    public boolean execute(Context ctx) {
+        String codePath = ctx.getString(Constants.TMP_PROJECT_SOURCE_CODE_PATH);
         if(StringUtils.isBlank(codePath)) {
-            logger.error("代码路径不存在, 请确认代码已拉取成功");
+            logger.error("the code path does not exist. Please confirm that the code has pulled successfully");
+            return false;
         }
-        String pomPath = FileUtils.merge(codePath, ctx.getString("deploy.maven.pom.path"));
-        // 如果不指定maven地址，可以从环境中获取
-        String mavenPath = ctx.getString("deploy.maven.root.path", System.getenv("MAVEN_HOME"));
-        String cmd = ctx.getString("deploy.maven.cmd");
+        String pomPath = FileUtils.merge(codePath, ctx.getString(Maven.POM_PATH));
+        // If not specify a Maven address, get it from the environment
+        String mavenPath = ctx.getString(Maven.MAVEN_PATH, System.getenv("MAVEN_HOME"));
+        String cmd = ctx.getString(Maven.MAVEN_COMMAND);
         Package pack = new MavenPackage(pomPath, cmd, mavenPath);
-        pack.pack();
+        return pack.pack();
     }
 }

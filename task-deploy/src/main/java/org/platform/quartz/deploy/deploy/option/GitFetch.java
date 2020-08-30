@@ -4,6 +4,8 @@ import org.platform.quartz.deploy.deploy.Context;
 import org.platform.quartz.deploy.deploy.listener.DeployListener;
 import org.platform.quartz.deploy.git.GitRepository;
 import org.platform.quartz.deploy.git.Repository;
+import org.platform.quartz.deploy.utils.Constants;
+import org.platform.quartz.deploy.utils.Constants.Git;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,21 +28,21 @@ public class GitFetch implements Fetch {
     }
 
     @Override
-    public void execute(Context ctx) {
-        String uri = ctx.getString("deploy.git.repository.http.uri");
-        String branch = ctx.getString("deploy.git.repository.branch");
-        String username = ctx.getString("deploy.git.username");
-        String password = ctx.getString("deploy.git.password");
-        String workSpace = ctx.getString("deploy.workspace");
+    public boolean execute(Context ctx) {
+        String uri = ctx.getString(Git.GIT_REPO_HTTP_URI);
+        String branch = ctx.getString(Git.GIT_REPO_BRANCH);
+        String username = ctx.getString(Git.GIT_REPO_USERNAME);
+        String password = ctx.getString(Git.GIT_REPO_PWD);
+        String workSpace = ctx.getString(Constants.DEPLOY_WORK_SPACE);
         Repository repo = new GitRepository.Builder().uri(uri)
                 .branch(branch)
                 .userName(username)
                 .password(password)
                 .workSpace(workSpace).build();
-        boolean success = repo.fetch();
-        logger.info("代码拉取结果: {}", success);
+        boolean result = repo.fetch();
         String codePath = repo.getSourcePath();
-        ctx.put("tmp.code.path", codePath);
+        ctx.put(Constants.TMP_PROJECT_SOURCE_CODE_PATH, codePath);
+        return result;
     }
 
     @Override

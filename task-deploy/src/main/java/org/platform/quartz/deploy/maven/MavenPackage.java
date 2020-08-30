@@ -44,15 +44,15 @@ public class MavenPackage implements Package {
      * 打包
      */
     @Override
-    public void pack() {
+    public boolean pack() {
         if(StringUtils.isAnyBlank(pomPath, cmd, mavenPath)) {
-            return;
+            return false;
         }
         InvocationRequest request = new DefaultInvocationRequest();
         request.setPomFile(new File(pomPath));
         if(!StringUtils.isBlank(cmd)) {
             if(cmd.startsWith("mvn")) {
-                cmd = cmd.replace("mvn", "");
+                cmd = cmd.replace("mvn", "").trim();
             }
             List<String> goals = Arrays.asList(cmd.split(" ")).stream().map(cs -> cs.trim()).filter(cs -> !StringUtils.isBlank(cs)).collect(Collectors.toList());
             request.setGoals(goals);
@@ -60,9 +60,11 @@ public class MavenPackage implements Package {
         Invoker invoker = new DefaultInvoker();
         invoker.setMavenHome(new File(mavenPath));
         try {
-            invoker.execute(request);
+            InvocationResult ir = invoker.execute(request);
+            return ir.getExitCode() == 0 ? true : false;
         } catch (MavenInvocationException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+            return false;
         }
     }
 }

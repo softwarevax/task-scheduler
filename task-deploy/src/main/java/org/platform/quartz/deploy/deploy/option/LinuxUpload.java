@@ -1,11 +1,14 @@
 package org.platform.quartz.deploy.deploy.option;
 
+import com.alibaba.fastjson.JSONArray;
+import lombok.extern.slf4j.Slf4j;
 import org.platform.quartz.deploy.deploy.Context;
 import org.platform.quartz.deploy.ssh.ganymed.GanymedSecureShell;
+import org.platform.quartz.deploy.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author twcao
@@ -14,18 +17,24 @@ import java.util.Arrays;
  * @classname LinuxUpload
  * @date 2020/1/17 13:59
  */
+@Slf4j
 public class LinuxUpload implements Upload {
 
     public static final Logger logger = LoggerFactory.getLogger(LinuxUpload.class);
 
     @Override
-    public void execute(Context ctx) {
-        GanymedSecureShell secureShell = new GanymedSecureShell(ctx.getString("deploy.upload.target.hostname"));
-        //secureShell.setStopIfAbsent(false);
-        secureShell.login(ctx.getString("deploy.upload.target.username"), ctx.getString("deploy.upload.target.password"));
-        String compressFile = ctx.getString("tmp.compress.target.file");
-        secureShell.put(Arrays.asList(compressFile), ctx.getString("deploy.upload.target.outcome.path"));
-        secureShell.close();
-        logger.info("部署文件上传完成, 远程主机路径 = {}", ctx.getString("deploy.upload.target.outcome.path"));
+    public boolean execute(Context ctx) {
+        try {
+            GanymedSecureShell secureShell = new GanymedSecureShell(ctx.getString(Constants.Upload.UPLOAD_HOST_NAME));
+            //secureShell.setStopIfAbsent(false);
+            secureShell.login(ctx.getString(Constants.Upload.UPLOAD_USER_NAME), ctx.getString(Constants.Upload.UPLOAD_PWD));
+            List<String> filterFiles = JSONArray.parseArray(ctx.getString(Constants.FileFilter.TMP_FILTER_FILES), String.class);
+            secureShell.put(filterFiles, ctx.getString(Constants.Upload.UPLOAD_OUTCOME_PATH));
+            secureShell.close();
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return false;
+        }
     }
 }

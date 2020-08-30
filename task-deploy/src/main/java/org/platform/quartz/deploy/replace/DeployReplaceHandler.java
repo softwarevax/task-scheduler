@@ -1,5 +1,6 @@
 package org.platform.quartz.deploy.replace;
 
+import lombok.extern.slf4j.Slf4j;
 import org.platform.quartz.deploy.utils.FileUtils;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
  * @classname DeployReplaceStepChain
  * @date 2020/1/16 9:32
  */
+@Slf4j
 public class DeployReplaceHandler implements ReplaceHandle {
 
     private List<ReplaceStep> steps;
@@ -30,7 +32,7 @@ public class DeployReplaceHandler implements ReplaceHandle {
     @Override
     public boolean doReplace() {
         try {
-            // 按照order从小到大排序，先执行最小的
+            // sort by order from small to large, performing the smallest first
             Collections.sort(steps, Comparator.comparing(ReplaceStep::getOrder));
             for(ReplaceStep step : steps) {
                 String replacePath = FileUtils.merge(step.getCodePath(), step.getFilePath());
@@ -38,7 +40,7 @@ public class DeployReplaceHandler implements ReplaceHandle {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             return false;
         }
     }

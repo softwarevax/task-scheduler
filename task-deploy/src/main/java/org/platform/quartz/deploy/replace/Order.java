@@ -10,4 +10,6 @@ package org.platform.quartz.deploy.replace;
 public interface Order {
 
     int getOrder();
+
+    default void setOrder() {}
 }

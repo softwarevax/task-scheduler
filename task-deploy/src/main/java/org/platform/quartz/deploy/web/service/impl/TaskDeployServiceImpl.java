@@ -1,10 +1,10 @@
 package org.platform.quartz.deploy.web.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.platform.quartz.deploy.deploy.AbstractDeploy;
 import org.platform.quartz.deploy.deploy.Context;
 import org.platform.quartz.deploy.deploy.Deploy;
 import org.platform.quartz.deploy.deploy.DeployFactory;
-import org.platform.quartz.deploy.deploy.option.*;
 import org.platform.quartz.deploy.utils.PropertyUtils;
 import org.platform.quartz.deploy.utils.StringUtils;
 import org.platform.quartz.deploy.web.dao.DeployConfigureDao;
@@ -26,6 +26,7 @@ import java.util.Properties;
  * @classname TaskDeployServiceImpl
  * @date 2020/1/18 16:06
  */
+@Slf4j
 @Service
 public class TaskDeployServiceImpl implements TaskDeployService {
 
@@ -44,15 +45,6 @@ public class TaskDeployServiceImpl implements TaskDeployService {
     @Override
     public String deploy(int taskId) {
         Properties props = new Properties();
-        List<TaskDeployEntity> taskEntities = dao.findByTaskId(taskId);
-        for (TaskDeployEntity entity : taskEntities) {
-            String key = entity.getPropertyKey();
-            String value = entity.getPropertyValue();
-            if(StringUtils.isAnyBlank(key, value)) {
-                continue;
-            }
-            props.put(key, value);
-        }
         List<DeployConfigure> configures = configureDao.getSystemProperties();
         for(DeployConfigure configure : configures) {
             String key = configure.getKey();
@@ -63,14 +55,26 @@ public class TaskDeployServiceImpl implements TaskDeployService {
             props.put(key, value);
         }
         List<Class<? extends Deploy>> deploys = new ArrayList<>();
-        deploys.add(DeployInit.class);
-        deploys.add(GitFetch.class);
-        deploys.add(FileReplace.class);
-        deploys.add(MavenPack.class);
-        deploys.add(FileFilter.class);
-        deploys.add(TarArchiveCompress.class);
-        deploys.add(LinuxUpload.class);
-        deploys.add(LinuxRun.class);
+        // user properties will override system properties
+        List<TaskDeployEntity> taskEntities = dao.findByTaskId(taskId);
+        for (TaskDeployEntity entity : taskEntities) {
+            String key = entity.getPropertyKey();
+            String value = entity.getPropertyValue();
+            if(StringUtils.isAnyBlank(key, value, entity.getFqn())) {
+                continue;
+            }
+            try {
+                Class<?> clazz = Class.forName(entity.getFqn());
+                if(!deploys.contains(clazz)) {
+                    deploys.add((Class<? extends Deploy>) clazz);
+                }
+                props.put(key, value);
+            } catch (ClassNotFoundException cnfe) {
+                log.error(cnfe.getMessage(), cnfe);
+            } catch (ClassCastException ccef) {
+                log.error(ccef.getMessage(), ccef);
+            }
+        }
         AbstractDeploy deploy = DeployFactory.getInstance(deploys);
         Context ctx = new Context();
         ctx.putAll(PropertyUtils.toMap(props));

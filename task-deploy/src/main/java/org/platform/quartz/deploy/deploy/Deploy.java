@@ -14,7 +14,7 @@ public interface Deploy extends Order {
 
     default DeployListener getListener() {return null;}
 
-    void execute(Context ctx);
+    boolean execute(Context ctx);
 
     default void setListener(DeployListener listener) {}
 }

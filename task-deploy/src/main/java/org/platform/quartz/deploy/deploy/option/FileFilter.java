@@ -1,14 +1,18 @@
 package org.platform.quartz.deploy.deploy.option;
 
+import com.alibaba.fastjson.JSON;
 import org.platform.quartz.deploy.deploy.Context;
+import org.platform.quartz.deploy.utils.CollectionUtils;
+import org.platform.quartz.deploy.utils.Constants;
 import org.platform.quartz.deploy.utils.FileUtils;
 import org.platform.quartz.deploy.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author twcao
@@ -21,43 +25,46 @@ public class FileFilter implements Filter {
 
     public static final Logger logger = LoggerFactory.getLogger(FileFilter.class);
 
-    public static final String PROPERTY_PREFIX = "deploy.filter";
-
     @Override
-    public void execute(Context ctx) {
-        String codePath = ctx.getString("tmp.code.path");
+    public boolean execute(Context ctx) {
+        String codePath = ctx.getString(Constants.TMP_PROJECT_SOURCE_CODE_PATH);
         if(StringUtils.isBlank(codePath)) {
-            logger.error("代码路径不存在, 请确认代码已拉取成功");
+            logger.error("the code path does not exist. Please confirm that the code has pulled successfully");
+            return false;
         }
-        Map<String, String> properties = ctx.getPrefix(PROPERTY_PREFIX);
-        if(CollectionUtils.isEmpty(properties)) {
-            return;
+        Map<String, String> properties = ctx.getPrefix(Constants.FileFilter.PROPERTY_PREFIX);
+        if(CollectionUtils.isBlank(properties)) {
+            return false;
         }
-        Collection<String> fileExt = properties.values();
-        String sourcePath = ctx.getString("deploy.compress.source.path");
-        File tmpSourcePath = new File(sourcePath + ".tmp");
-        if(!tmpSourcePath.exists()) {
-            tmpSourcePath.mkdir();
-        }
-        FileUtils.copyFolder(sourcePath, tmpSourcePath.getAbsolutePath());
+        String filterPath = properties.get(Constants.FileFilter.PATH);
         List<String> files = new ArrayList<>();
-        FileUtils.files(tmpSourcePath.getAbsolutePath(), files);
-        for(int i = 0, len = files.size(); i < len; i++) {
-            String fileName = files.get(i);
-            boolean fit = false;
-            Iterator<String> exts = fileExt.iterator();
-            while (exts.hasNext()) {
-                String ext = exts.next();
-                if(fileName.endsWith(ext)) {
-                    fit = true;
-                    break;
+        List<String> filtered = new ArrayList<>();
+        File filterRootPath = new File(FileUtils.merge(codePath, filterPath));
+        if(filterRootPath.isFile()) {
+            filtered.add(filterRootPath.getAbsolutePath());
+        } else {
+            FileUtils.files(filterRootPath.getAbsolutePath(), files);
+            if(CollectionUtils.isBlank(files)) {
+                return false;
+            }
+            String exts = properties.get(Constants.FileFilter.FILE_EXT);
+            List<String> extList = StringUtils.split(exts, ",");
+            if(CollectionUtils.isBlank(extList)) {
+                return false;
+            }
+            for(int i = 0, len = files.size(); i < len; i++) {
+                String fileName = files.get(i);
+                for(String ext : extList) {
+                    if(fileName.endsWith(ext)) {
+                        filtered.add(files.get(i));
+                    }
                 }
             }
-            if(!fit) {
-                // 删除不符合条件的文件
-                FileUtils.forceDelete(fileName);
-            }
         }
-        ctx.put("tmp.compress.source.path", tmpSourcePath.getAbsolutePath());
+        if(CollectionUtils.isBlank(filtered)) {
+            return false;
+        }
+        ctx.put(Constants.FileFilter.TMP_FILTER_FILES, JSON.toJSONString(filtered));
+        return true;
     }
 }

@@ -12,5 +12,5 @@ public interface Package {
     /**
      * 打包
      */
-    void pack();
+    boolean pack();
 }

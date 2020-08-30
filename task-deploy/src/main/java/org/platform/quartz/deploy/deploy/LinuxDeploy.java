@@ -10,8 +10,9 @@ package org.platform.quartz.deploy.deploy;
 public class LinuxDeploy extends AbstractDeploy {
 
     @Override
-    public void execute(Context ctx) {
+    public boolean execute(Context ctx) {
         super.execute(ctx);
+        return true;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.platform.quartz.deploy.deploy;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import java.util.List;
  * @classname DeployFactory
  * @date 2020/1/17 14:38
  */
+@Slf4j
 public class DeployFactory {
 
     public static AbstractDeploy getInstance(List<Class<? extends Deploy>> deploys) {
@@ -29,7 +32,7 @@ public class DeployFactory {
                 deployList.add(d);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         deploy.addDeploy(deployList);
         return deploy;

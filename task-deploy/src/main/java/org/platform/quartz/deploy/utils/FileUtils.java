@@ -183,4 +183,15 @@ public class FileUtils {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 获取文件名
+     * @param path
+     */
+    public static String getFileNameWithExt(String path) {
+        if(StringUtils.isBlank(path)) {
+            return path;
+        }
+        return path.substring(path.lastIndexOf(File.separator) + 1);
+    }
 }
