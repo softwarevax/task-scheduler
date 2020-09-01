@@ -6,4 +6,4 @@
 
 
 
-1、
+执行windows命令: String command = "cmd /c E: && cd E:\\project\\sublime\\sc-oauth && npm run build";
