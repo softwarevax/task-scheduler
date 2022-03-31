@@ -27,7 +27,7 @@
         <maven.invoker.version>3.0.1</maven.invoker.version>
         <compress.version>1.19</compress.version>
         <fastjson.version>1.2.47</fastjson.version>
-        <spring.version>5.1.6.RELEASE</spring.version>
+        <spring.version>5.3.18</spring.version>
         <schedule.version>1.0.0</schedule.version>
         <httpclient.version>4.5.6</httpclient.version>
         <httpcore.version>4.4.10</httpcore.version>
